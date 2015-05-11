@@ -2,6 +2,7 @@ import os
 import ConfigParser
 import requests
 import json
+from instance import Instance
 
 class Client(object):
 
@@ -52,3 +53,10 @@ class Client(object):
         elif method=='PUT':
             return requests.put(uri, headers=headers, data=data)
 
+    def get_all_instances(self):
+        response = self.request(endpoint='instances').json()
+
+        instances = [Instance(source=instance, client=self) for instance in
+                                                            response['data']]
+
+        return instances
