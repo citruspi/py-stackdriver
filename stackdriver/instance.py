@@ -49,7 +49,7 @@ class Instance(object):
 
     @property
     def tags(self):
-        return self.__source['tags']
+        return {tag['name']: tag['value'] for tag in self.__source['tags']}
 
     @property
     def launch_epoch(self):
