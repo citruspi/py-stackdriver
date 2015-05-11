@@ -53,10 +53,20 @@ class Client(object):
         elif method=='PUT':
             return requests.put(uri, headers=headers, data=data)
 
-    def get_all_instances(self):
-        response = self.request(endpoint='instances').json()
+    def get_all_instances(self, ids=None):
+        if not ids:
+            response = self.request(endpoint='instances').json()
 
-        instances = [Instance(source=instance, client=self) for instance in
+            instances = [Instance(source=instance, client=self) for instance in
                                                             response['data']]
+        else:
+            instances = []
+
+            for id_ in ids:
+                endpoint = 'instances/{instance_id}'.format(instance_id=id_)
+
+                response = self.request(endpoint=endpoint).json()
+
+                instances.append(Instance(source=response, client=self))
 
         return instances
