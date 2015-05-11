@@ -1,9 +1,14 @@
 import os
 import ConfigParser
+import requests
+import json
 
 class Client(object):
 
     authorization = None
+
+    api_location = 'https://api.stackdriver.com'
+    api_version = 'v0.2'
 
     def __init__(self, username=None, api_key=None):
         if username is None:
@@ -23,4 +28,27 @@ class Client(object):
                 api_key = config.get('Credentials', 'api_key')
 
         self.authorization = (username, api_key)
+
+    def request(self, method='GET', endpoint=None, body=None):
+        headers = {}
+
+        headers['x-stackdriver-apikey'] = self.authorization[1]
+        headers['Content-Type'] = 'application/json'
+
+        if method in ['POST', 'PUT']:
+            is not body:
+                body = {}
+
+            body['username'] = self.authorization[0]
+
+            data=json.dumps(body)
+
+        uri = '/'.join([api_location, api_version, endpoint])
+
+        if method=='GET':
+            return requests.get(uri, headers=headers)
+        elif method=='POST':
+            return requests.post(uri, headers=headers, data=data)
+        elif method=='PUT':
+            return requests.put(uri, headers=headers, data=data)
 
