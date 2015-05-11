@@ -36,7 +36,7 @@ class Client(object):
         headers['Content-Type'] = 'application/json'
 
         if method in ['POST', 'PUT']:
-            is not body:
+            if not body:
                 body = {}
 
             body['username'] = self.authorization[0]
