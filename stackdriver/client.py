@@ -43,7 +43,7 @@ class Client(object):
 
             data=json.dumps(body)
 
-        uri = '/'.join([api_location, api_version, endpoint])
+        uri = '/'.join([self.api_location, self.api_version, endpoint])
 
         if method=='GET':
             return requests.get(uri, headers=headers)
