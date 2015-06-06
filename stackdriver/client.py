@@ -4,6 +4,7 @@ import requests
 import json
 from instance import Instance
 
+
 class Client(object):
 
     authorization = None
@@ -42,23 +43,23 @@ class Client(object):
 
             body['username'] = self.authorization[0]
 
-            data=json.dumps(body)
+            data = json.dumps(body)
 
         uri = '/'.join([self.api_location, self.api_version, endpoint])
 
-        if method=='GET':
+        if method == 'GET':
             return requests.get(uri, headers=headers)
-        elif method=='POST':
+        elif method == 'POST':
             return requests.post(uri, headers=headers, data=data)
-        elif method=='PUT':
+        elif method == 'PUT':
             return requests.put(uri, headers=headers, data=data)
 
     def get_all_instances(self, ids=None):
         if not ids:
             response = self.request(endpoint='instances').json()
 
-            instances = [Instance(source=instance, client=self) for instance in
-                                                            response['data']]
+            instances = [Instance(source=instance, client=self)
+                         for instance in response['data']]
         else:
             instances = []
 
@@ -67,6 +68,7 @@ class Client(object):
 
                 response = self.request(endpoint=endpoint).json()
 
-                instances.append(Instance(source=response, client=self))
+                instances.append(Instance(source=response['data'],
+                                          client=self))
 
         return instances
