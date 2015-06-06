@@ -1,3 +1,6 @@
+import datetime
+
+
 class Instance(object):
 
     __source = None
@@ -52,8 +55,10 @@ class Instance(object):
         return {tag['name']: tag['value'] for tag in self.__source['tags']}
 
     @property
-    def launch_epoch(self):
-        return self.__source['launch_epoch']
+    def launched(self):
+        timestamp = self.__source['launch_epoch']
+
+        return datetime.datetime.fromtimestamp(timestamp)
 
     @property
     def monitor_epoch(self):
@@ -70,4 +75,3 @@ class Instance(object):
     @property
     def extractor_version(self):
         return self.__source['extractor_version']
-
