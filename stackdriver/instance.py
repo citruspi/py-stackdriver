@@ -107,3 +107,16 @@ class Instance(object):
     @property
     def extractor_version(self):
         return self.__source['extractor_version']
+
+    @property
+    def maintenance(self):
+        try:
+            return self.__source['maintenance_mode']
+        except KeyError:
+            endpoint = 'instances/{id}/maintenance/'.format(id=self.id)
+            response = self.__client.request(endpoint=endpoint).json()
+
+            self.__source['maintenance_mode'] = Maintenance(response['data'],
+                                                            self)
+
+            return self.__source['maintenance_mode']
