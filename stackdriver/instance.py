@@ -1,6 +1,36 @@
 import datetime
 
 
+class Maintenance(object):
+
+    __source = None
+    __instance = None
+
+    def __init__(self, source, instance):
+        self.__source = source
+        self.__instance = instance
+
+    @property
+    def is_enabled(self):
+        return self.__source['maintenance']
+
+    @property
+    def reason(self):
+        return self.__source.get('reason', None)
+
+    @property
+    def user(self):
+        return self.__source.get('username', None)
+
+    @property
+    def expires(self):
+        try:
+            timestamp = self.__source['schedule']['expires_epoch']
+            return datetime.datetime.fromtimestamp(timestamp)
+        except KeyError:
+            return None
+
+
 class Instance(object):
 
     __source = None
