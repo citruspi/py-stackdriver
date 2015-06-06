@@ -61,8 +61,10 @@ class Instance(object):
         return datetime.datetime.fromtimestamp(timestamp)
 
     @property
-    def monitor_epoch(self):
-        return self.__source['monitor_epoch']
+    def last_monitored(self):
+        timestamp = self.__source['monitor_epoch']
+
+        return datetime.datetime.fromtimestamp(timestamp)
 
     @property
     def state(self):
