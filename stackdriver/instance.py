@@ -30,6 +30,29 @@ class Maintenance(object):
         except KeyError:
             return None
 
+    def enable(self, reason, expires=None):
+        body = {
+            'username': self.__instance._Instance__client.authorization[0],
+            'reason': reason,
+            'maintenance': True
+        }
+
+        if expires:
+            delta = expires - datetime.datetime(1970, 1, 1)
+            expires_epoch = int(delta.total_seconds())
+
+            body['schedule'] = {
+                'expires_epoch': expires_epoch
+            }
+
+        endpoint = 'instances/{id}/maintenance/'.format(id=self.__instance.id)
+
+        response = self.__instance._Instance__client.request(method='PUT',
+                                                             endpoint=endpoint,
+                                                             body=body)
+
+        return (response.status_code == 200)
+
 
 class Instance(object):
 
