@@ -30,6 +30,12 @@ class Maintenance(object):
         except KeyError:
             return None
 
+    def _refresh(self):
+        endpoint = 'instances/{id}/maintenance/'.format(id=self.__instance.id)
+        response = self.__instance._Instance__client.request(endpoint=endpoint)
+
+        self.__source = response.json()['data']
+
     def enable(self, reason, expires=None):
         body = {
             'username': self.__instance._Instance__client.authorization[0],
@@ -50,6 +56,8 @@ class Maintenance(object):
         response = self.__instance._Instance__client.request(method='PUT',
                                                              endpoint=endpoint,
                                                              body=body)
+
+        self._refresh()
 
         return (response.status_code == 200)
 
@@ -73,6 +81,8 @@ class Maintenance(object):
         response = self.__instance._Instance__client.request(method='PUT',
                                                              endpoint=endpoint,
                                                              body=body)
+
+        self._refresh()
 
         return (response.status_code == 200)
 
