@@ -1,3 +1,4 @@
+import datetime
 import os
 import ConfigParser
 import requests
@@ -12,7 +13,11 @@ class Client(object):
     api_location = 'https://api.stackdriver.com'
     api_version = 'v0.2'
 
-    def __init__(self, username=None, api_key=None):
+    cache = {}
+    cache_enabled = False
+    cache_timeout = 60
+
+    def __init__(self, username=None, api_key=None, cache=True):
         if username is None:
             username = os.environ.get('STACKDRIVER_USERNAME', None)
 
@@ -31,7 +36,9 @@ class Client(object):
 
         self.authorization = (username, api_key)
 
-    def request(self, method='GET', endpoint=None, body=None):
+        self.cache_enabled = cache
+
+    def request(self, method='GET', endpoint=None, body=None, use_cache=True):
         headers = {}
 
         headers['x-stackdriver-apikey'] = self.authorization[1]
@@ -48,7 +55,29 @@ class Client(object):
         uri = '/'.join([self.api_location, self.api_version, endpoint])
 
         if method == 'GET':
-            return requests.get(uri, headers=headers)
+            if self.cache_enabled and use_cache:
+                try:
+                    entry = self.cache[uri]
+
+                    now = datetime.datetime.utcnow()
+                    timestamp = entry['timestamp']
+
+                    elapsed_time = (now-timestamp).total_seconds()
+
+                    if elapsed_time < self.cache_timeout:
+                        return entry['value']
+
+                    del self.cache[entry]
+                except KeyError:
+                    pass
+
+            r = requests.get(uri, headers=headers)
+
+            if self.cache_enabled and use_cache:
+                self.cache[uri] = {'timestamp': datetime.datetime.utcnow(),
+                                   'value': r}
+
+            return r
         elif method == 'POST':
             return requests.post(uri, headers=headers, data=data)
         elif method == 'PUT':
